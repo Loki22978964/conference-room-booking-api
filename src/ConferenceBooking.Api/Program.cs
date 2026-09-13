@@ -1,3 +1,4 @@
+using ConferenceBooking.Application.Services;
 using ConferenceBooking.Application.Interfaces;
 using ConferenceBooking.Infrastructure.Persistence;
 using ConferenceBooking.Infrastructure.Repositories;
@@ -11,7 +12,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IRoomService, RoomService>();
 
 var app = builder.Build();
 
@@ -38,9 +41,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+    //app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.MapControllers();
 
