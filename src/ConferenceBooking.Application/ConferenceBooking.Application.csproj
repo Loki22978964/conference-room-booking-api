@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Ardalis.Specification" Version="9.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ConferenceBooking.Domain\ConferenceBooking.Domain.csproj" />
   </ItemGroup>
 

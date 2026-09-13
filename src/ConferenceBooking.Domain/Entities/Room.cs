@@ -4,9 +4,8 @@ using System.Text;
 
 namespace ConferenceBooking.Domain.Entities;
 
-public class Room
+public class Room : BaseEntity
 {
-    public Guid Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public int Capacity { get; private set; }
     public decimal BaseHourlyRate { get; private set; }

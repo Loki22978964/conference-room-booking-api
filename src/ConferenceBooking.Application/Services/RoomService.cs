@@ -1,9 +1,7 @@
 ﻿using ConferenceBooking.Application.DTOs;
 using ConferenceBooking.Application.Interfaces;
+using ConferenceBooking.Application.Specifications;
 using ConferenceBooking.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConferenceBooking.Application.Services;
 
@@ -32,7 +30,7 @@ public class RoomService : IRoomService
 
     public async Task<RoomDto?> GetRoomAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var room = await _unitOfWork.Rooms.GetByIdWithServicesAsync(id, cancellationToken);
+        var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdWithServicesSpec(id), cancellationToken);
 
         if (room is null)
         {
@@ -56,7 +54,7 @@ public class RoomService : IRoomService
 
     public async Task<bool> UpdateRoomAsync(Guid id, CreateOrUpdateRoomRequest request, CancellationToken cancellationToken = default)
     {
-        var room = await _unitOfWork.Rooms.GetByIdWithServicesAsync(id, cancellationToken);
+        var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdWithServicesSpec(id), cancellationToken);
 
         if (room is null)
         {
@@ -71,7 +69,7 @@ public class RoomService : IRoomService
 
     public async Task<bool> DeleteRoomAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var room = await _unitOfWork.Rooms.GetByIdAsync(id, cancellationToken);
+        var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdSpec(id), cancellationToken);
 
         if (room is null)
         {
