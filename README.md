@@ -114,8 +114,6 @@ dotnet test
 # Unit tests only
 dotnet test tests/ConferenceBooking.UnitTests
 
-# Integration tests only
-dotnet test tests/ConferenceBooking.IntegrationTests
 ```
 
 ## API Overview
