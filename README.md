@@ -182,40 +182,40 @@ Overlapping bookings for the same room are rejected at two levels:
 
 This is a work-in-progress learning/test project. Contributions and suggestions are welcome via issues or pull requests.
 
-## 🎥 Демонстрація роботи API
+## 🎥 API Demonstration
 
-Нижче наведено приклади роботи ключового функціоналу через Swagger UI.
+Below are examples of the key functionality in action via the Swagger UI.
 
-### 🏢 Управління залами (RoomsController)
+### 🏢 Room Management (RoomsController)
 
-**1. Створення нового залу**
-![Створення залу](images/creating-a-room.gif)
+**1. Creating a new room**
+![Creating a room](images/creating-a-room.gif)
 
-**2. Отримання залу за ID**
-![Отримання залу](images/get-room-by-Id.gif)
+**2. Getting a room by ID**
+![Getting a room](images/get-room-by-Id.gif)
 
-**3. Оновлення даних залу**
-![Оновлення залу](images/Updating-room-data.gif)
+**3. Updating room data**
+![Updating a room](images/Updating-room-data.gif)
 
-**4. Видалення залу (Soft Delete)**
-![Видалення залу](images/Delete-a-room.gif)
+**4. Deleting a room (Soft Delete)**
+![Deleting a room](images/Delete-a-room.gif)
 
-**5. Пошук доступних залів на вказаний час**
-![Пошук вільних залів](images/finding-available-rooms.gif)
-
----
-
-### 📅 Бронювання (BookingsController)
-
-**6. Успішне бронювання залу з розрахунком ціни**
-![Успішне бронювання](images/Successful-lease-of-a-space.gif)
-
-**7. Захист від подвійного бронювання (409 Conflict)**
-![Захист від подвійного бронювання](images/an-attempt-to-rent-a-property-that-has-already-been-rented.gif) 
+**5. Finding available rooms for a specified time**
+![Finding available rooms](images/finding-available-rooms.gif)
 
 ---
 
-### 📊 Аналітика (ReportsController)
+### 📅 Bookings (BookingsController)
 
-**8. Генерація звіту про доходи залів**
-![Генерація звіту](images/Generating-a-lease-report.gif)
+**6. Successful room booking with price calculation**
+![Successful booking](images/Successful-lease-of-a-space.gif)
+
+**7. Double booking protection (409 Conflict)**
+![Double booking protection](images/an-attempt-to-rent-a-property-that-has-already-been-rented.gif) 
+
+---
+
+### 📊 Analytics (ReportsController)
+
+**8. Generating a room revenue report**
+![Generating a report](images/Generating-a-lease-report.gif)
