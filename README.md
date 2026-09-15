@@ -186,7 +186,7 @@ This is a work-in-progress learning/test project. Contributions and suggestions 
 
 Below are examples of the key functionality in action via the Swagger UI.
 
-### 🏢 Room Management (RoomsController)
+###  Room Management (RoomsController)
 
 **1. Creating a new room**
 ![Creating a room](images/creating-a-room.gif)
@@ -205,7 +205,7 @@ Below are examples of the key functionality in action via the Swagger UI.
 
 ---
 
-### 📅 Bookings (BookingsController)
+###  Bookings (BookingsController)
 
 **6. Successful room booking with price calculation**
 ![Successful booking](images/Successful-lease-of-a-space.gif)
@@ -215,7 +215,7 @@ Below are examples of the key functionality in action via the Swagger UI.
 
 ---
 
-### 📊 Analytics (ReportsController)
+###  Analytics (ReportsController)
 
 **8. Generating a room revenue report**
 ![Generating a report](images/Generating-a-lease-report.gif)
