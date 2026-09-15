@@ -1,5 +1,5 @@
-using ConferenceBooking.Application.Services;
 using ConferenceBooking.Application.Interfaces;
+using ConferenceBooking.Application.Services;
 using ConferenceBooking.Infrastructure.Persistence;
 using ConferenceBooking.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +11,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
@@ -44,6 +52,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     //app.UseHttpsRedirection();
 }
+
+
 
 app.MapControllers();
 

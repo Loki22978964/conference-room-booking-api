@@ -1,1 +1,183 @@
-# conference-room-booking-api
+# Conference Room Booking API
+
+A REST API for managing conference room bookings — searching for available rooms, booking them with optional add-on services, and managing rooms/services as an administrator.
+
+Built with **.NET 10**, **Entity Framework Core**, and **PostgreSQL**, following Clean Architecture principles.
+
+## Features
+
+- 🏢 **Room management** — create, update, soft-delete conference rooms
+- 🔍 **Availability search** — find rooms by date, time window, and required capacity
+- 📅 **Bookings** — book a room with optional services, with dynamic pricing based on time of day
+- 🛡️ **Overlap protection** — a PostgreSQL exclusion constraint prevents double-booking at the database level
+- 💰 **Dynamic pricing** — hourly rate multipliers for discount/peak/standard time windows
+- 📖 **Swagger / OpenAPI** — interactive API documentation out of the box
+
+## Architecture
+
+The solution follows a Clean Architecture layout, with dependencies pointing inward:
+
+```
+src/
+├── ConferenceBooking.Domain          # Entities, invariants, no external dependencies
+├── ConferenceBooking.Application     # Use cases, interfaces, specifications, DTOs
+├── ConferenceBooking.Infrastructure  # EF Core, PostgreSQL, repositories, migrations
+└── ConferenceBooking.Api             # Controllers, DI composition, Swagger
+
+tests/
+├── ConferenceBooking.UnitTests        # Domain + Application unit tests (xUnit, Moq, FluentAssertions)
+└── ConferenceBooking.IntegrationTests # End-to-end tests against a real database
+```
+
+- **Domain** entities (`Room`, `Booking`, `Service`) encapsulate their own invariants (e.g. a `Booking` cannot be created in the past, or with `start >= end`).
+- **Application** services (`RoomService`, `BookingService`) contain the use-case logic and depend only on abstractions (`IUnitOfWork`, repository interfaces).
+- Data access uses the **Repository + Unit of Work** pattern, combined with [Ardalis.Specification](https://github.com/ardalis/Specification) for composable, reusable queries (e.g. `RoomByIdWithServicesSpec`, `AvailableRoomsSpec`).
+- **Infrastructure** is the only layer that knows about EF Core / Npgsql; database-specific errors (like overlap-constraint violations) are translated into domain-friendly exceptions before crossing into the Application layer.
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Runtime | .NET 10 |
+| Database | PostgreSQL |
+| ORM | Entity Framework Core (Npgsql provider) |
+| Query specifications | Ardalis.Specification |
+| API docs | Swashbuckle (Swagger UI) |
+| Testing | xUnit, Moq, FluentAssertions |
+
+## Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Docker](https://www.docker.com/) and Docker Compose
+- The `dotnet-ef` global tool:
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd conference-room-booking-api
+```
+
+### 2. Start PostgreSQL via Docker Compose
+
+```bash
+docker compose up -d
+```
+
+This starts a PostgreSQL container on port `5432` (see `docker-compose.yml` for credentials/config).
+
+### 3. Configure the connection string
+
+Check `src/ConferenceBooking.Api/appsettings.json` and adjust if needed — it should match your `docker-compose.yml` settings:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=conference_db;Username=postgres;Password=Password123!"
+  }
+}
+```
+
+### 4. Apply database migrations
+
+```bash
+dotnet ef database update --project src/ConferenceBooking.Infrastructure --startup-project src/ConferenceBooking.Api
+```
+
+### 5. Run the API
+
+```bash
+dotnet run --project src/ConferenceBooking.Api
+```
+
+In the **Development** environment, the app automatically applies pending migrations and seeds sample data (rooms, services) on startup.
+
+The API will be available at:
+- `http://localhost:5292`
+- `https://localhost:7090`
+
+Swagger UI: `http://localhost:5292/swagger`
+
+> **Note:** if you haven't trusted the local HTTPS dev certificate yet, run `dotnet dev-certs https --trust`, or use the HTTP URL during local development.
+
+## Running Tests
+
+```bash
+# All tests
+dotnet test
+
+# Unit tests only
+dotnet test tests/ConferenceBooking.UnitTests
+
+# Integration tests only
+dotnet test tests/ConferenceBooking.IntegrationTests
+```
+
+## API Overview
+
+### Rooms
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/Rooms` | Create a new room |
+| `GET` | `/api/Rooms/{id}` | Get a room by id (with its services) |
+| `PUT` | `/api/Rooms/{id}` | Update room details |
+| `DELETE` | `/api/Rooms/{id}` | Soft-delete a room |
+| `GET` | `/api/Rooms/available` | Search available rooms by date, time range, and capacity |
+
+### Bookings
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/Bookings` | Book a room for a time slot, with optional services |
+
+Full request/response schemas are available in Swagger UI once the app is running.
+
+### Example: search for available rooms
+
+```
+GET /api/Rooms/available?Date=2026-09-20&StartTime=10:00:00&EndTime=12:00:00&Capacity=10
+```
+
+### Example: create a booking
+
+```json
+POST /api/Bookings
+{
+  "roomId": "122e92b7-c029-4391-a0a9-c91e45f41180",
+  "startDateTimeUtc": "2026-09-20T10:00:00Z",
+  "durationHours": 2,
+  "serviceIds": []
+}
+```
+
+## Pricing Logic
+
+Room cost is calculated per hour segment based on the local (Kyiv) time of day:
+
+| Time window (local) | Multiplier |
+|---|---|
+| 06:00 – 09:00 | ×0.9 (discount) |
+| 09:00 – 12:00 | ×1.0 (standard) |
+| 12:00 – 14:00 | ×1.15 (peak surcharge) |
+| 14:00 – 18:00 | ×1.0 (standard) |
+| 18:00 – 23:00 | ×0.8 (evening discount) |
+| 23:00 – 06:00 | ×1.0 (default) |
+
+A booking that spans multiple windows is billed proportionally per segment. See `PriceCalculator.cs` for the implementation.
+
+## Double-Booking Prevention
+
+Overlapping bookings for the same room are rejected at two levels:
+
+1. **Database**: a PostgreSQL exclusion constraint (using the `btree_gist` extension) guarantees no two bookings for the same room can have overlapping time ranges, even under concurrent requests.
+2. **API**: a constraint violation is caught and translated into a `409 Conflict` response with a clear error message.
+
+## Project Status
+
+This is a work-in-progress learning/test project. Contributions and suggestions are welcome via issues or pull requests.
