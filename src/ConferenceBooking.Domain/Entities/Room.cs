@@ -39,6 +39,16 @@ public class Room : BaseEntity
         BaseHourlyRate = baseHourlyRate;
     }
 
+    public void AddService(Guid serviceId)
+    {
+        if (RoomServices.Any(rs => rs.ServiceId == serviceId))
+        {
+            return;
+        }
+
+        RoomServices.Add(new RoomService(Id, serviceId));
+    }
+
     public void MarkAsDeleted()
     {
         IsActive = false;
