@@ -181,3 +181,41 @@ Overlapping bookings for the same room are rejected at two levels:
 ## Project Status
 
 This is a work-in-progress learning/test project. Contributions and suggestions are welcome via issues or pull requests.
+
+## 🎥 Демонстрація роботи API
+
+Нижче наведено приклади роботи ключового функціоналу через Swagger UI.
+
+### 🏢 Управління залами (RoomsController)
+
+**1. Створення нового залу**
+![Створення залу](assets/creating-a-room.gif)
+
+**2. Отримання залу за ID**
+![Отримання залу](assets/get-room-by-Id.gif)
+
+**3. Оновлення даних залу**
+![Оновлення залу](assets/Updating-room-data.gif)
+
+**4. Видалення залу (Soft Delete)**
+![Видалення залу](assets/Delete-a-room.gif)
+
+**5. Пошук доступних залів на вказаний час**
+![Пошук вільних залів](assets/finding-available-rooms.gif)
+
+---
+
+### 📅 Бронювання (BookingsController)
+
+**6. Успішне бронювання залу з розрахунком ціни**
+![Успішне бронювання](assets/Successful-lease-of-a-space.gif)
+
+**7. Захист від подвійного бронювання (409 Conflict)**
+![Захист від подвійного бронювання](assets/an-attempt-to-rent-a-property-that-has-already.gif) 
+
+---
+
+### 📊 Аналітика (ReportsController)
+
+**8. Генерація звіту про доходи залів**
+![Генерація звіту](assets/Generating-a-lease-report.gif)
