@@ -17,11 +17,28 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+//    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+//    options.IncludeXmlComments(xmlPath);
+//});
+
 builder.Services.AddSwaggerGen(options =>
 {
+    // Отримуємо назву поточної збірки (ConferenceBooking.Api.xml)
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        // Другий аргумент true вмикає коментарі для самого контролера/тегів
+        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+    else
+    {
+        Console.WriteLine($"[SWAGGER WARNING] XML documentation file not found at: {xmlPath}");
+    }
 });
 
 var app = builder.Build();
