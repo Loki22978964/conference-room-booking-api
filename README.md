@@ -189,33 +189,33 @@ This is a work-in-progress learning/test project. Contributions and suggestions 
 ### 🏢 Управління залами (RoomsController)
 
 **1. Створення нового залу**
-![Створення залу](assets/creating-a-room.gif)
+![Створення залу](images/creating-a-room.gif)
 
 **2. Отримання залу за ID**
-![Отримання залу](assets/get-room-by-Id.gif)
+![Отримання залу](images/get-room-by-Id.gif)
 
 **3. Оновлення даних залу**
-![Оновлення залу](assets/Updating-room-data.gif)
+![Оновлення залу](images/Updating-room-data.gif)
 
 **4. Видалення залу (Soft Delete)**
-![Видалення залу](assets/Delete-a-room.gif)
+![Видалення залу](images/Delete-a-room.gif)
 
 **5. Пошук доступних залів на вказаний час**
-![Пошук вільних залів](assets/finding-available-rooms.gif)
+![Пошук вільних залів](images/finding-available-rooms.gif)
 
 ---
 
 ### 📅 Бронювання (BookingsController)
 
 **6. Успішне бронювання залу з розрахунком ціни**
-![Успішне бронювання](assets/Successful-lease-of-a-space.gif)
+![Успішне бронювання](images/Successful-lease-of-a-space.gif)
 
 **7. Захист від подвійного бронювання (409 Conflict)**
-![Захист від подвійного бронювання](assets/an-attempt-to-rent-a-property-that-has-already.gif) 
+![Захист від подвійного бронювання](images/an-attempt-to-rent-a-property-that-has-already-been-rented.gif) 
 
 ---
 
 ### 📊 Аналітика (ReportsController)
 
 **8. Генерація звіту про доходи залів**
-![Генерація звіту](assets/Generating-a-lease-report.gif)
+![Генерація звіту](images/Generating-a-lease-report.gif)
