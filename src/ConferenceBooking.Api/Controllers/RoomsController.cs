@@ -44,4 +44,11 @@ public class RoomsController : ControllerBase
         var deleted = await _roomService.DeleteRoomAsync(id, cancellationToken);
         return deleted ? Ok(new { Message = "Room deleted successfully" }) : NotFound();
     }
+
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailableRooms([FromQuery] SearchRoomsRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _roomService.GetAvailableRoomsAsync(request, cancellationToken);
+        return Ok(result);
+    }
 }

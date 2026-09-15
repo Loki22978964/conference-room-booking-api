@@ -11,4 +11,5 @@ public interface IRoomService
     Task<RoomDto?> GetRoomAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> UpdateRoomAsync(Guid id, CreateOrUpdateRoomRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteRoomAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<List<RoomDto>> GetAvailableRoomsAsync(SearchRoomsRequest request, CancellationToken cancellationToken = default);
 }

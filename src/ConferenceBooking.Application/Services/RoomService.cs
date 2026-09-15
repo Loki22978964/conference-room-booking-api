@@ -81,4 +81,27 @@ public class RoomService : IRoomService
 
         return true;
     }
+
+    public async Task<List<RoomDto>> GetAvailableRoomsAsync(SearchRoomsRequest request, CancellationToken cancellationToken = default)
+    {
+        var startUtc = request.Date.Date.Add(request.StartTime).ToUniversalTime();
+        var endUtc = request.Date.Date.Add(request.EndTime).ToUniversalTime();
+
+        var spec = new AvailableRoomsSpec(startUtc, endUtc, request.Capacity);
+        var rooms = await _unitOfWork.Rooms.ListAsync(spec, cancellationToken);
+
+        return rooms.Select(r => new RoomDto
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Capacity = r.Capacity,
+            BaseHourlyRate = r.BaseHourlyRate,
+            Services = r.RoomServices.Select(rs => new ServiceDto
+            {
+                Id = rs.Service.Id,
+                Name = rs.Service.Name,
+                Price = rs.Service.Price
+            }).ToList()
+        }).ToList();
+    }
 }

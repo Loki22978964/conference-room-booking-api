@@ -27,6 +27,7 @@ public class Booking : BaseEntity
         DateTime startTimeUtc,
         DateTime endTimeUtc,
         decimal hourlyRateSnapshot,
+        decimal calculatedRoomCost,
         IEnumerable<(Guid ServiceId, decimal Price)> selectedServices)
     {
         if (startTimeUtc >= endTimeUtc)
@@ -42,21 +43,16 @@ public class Booking : BaseEntity
         HourlyRateSnapshot = hourlyRateSnapshot;
         CreatedAtUtc = DateTime.UtcNow;
 
-        CalculateTotalPrice(selectedServices);
+        CalculateTotalPrice(calculatedRoomCost, selectedServices);
     }
 
-    private void CalculateTotalPrice(IEnumerable<(Guid ServiceId, decimal Price)> selectedServices)
+    private void CalculateTotalPrice(decimal roomCost, IEnumerable<(Guid ServiceId, decimal Price)> selectedServices)
     {
-        var durationHours = (decimal)(EndTimeUtc - StartTimeUtc).TotalHours;
-        var roomCost = durationHours * HourlyRateSnapshot;
-
-        decimal servicesCost = 0;
+        decimal servicesCost = selectedServices.Sum(s => s.Price);
         foreach (var service in selectedServices)
         {
             BookedServices.Add(new BookingService(Id, service.ServiceId, service.Price));
-            servicesCost += service.Price;
         }
-
         TotalPrice = roomCost + servicesCost;
     }
 }
