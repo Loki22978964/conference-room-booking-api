@@ -16,7 +16,7 @@ public static class PriceCalculator
 
         var current = startLocal;
 
-        while(current < endLocal)
+        while (current < endLocal)
         {
             var nextHour = new DateTime(current.Year, current.Month, current.Day, current.Hour, 0, 0, current.Kind).AddHours(1);
             var stepEnd = nextHour < endLocal ? nextHour : endLocal;
@@ -29,7 +29,7 @@ public static class PriceCalculator
             current = stepEnd;
         }
 
-        return  totalCost;
+        return totalCost;
     }
 
     public static decimal GetMultiplierForHour(int hour)
