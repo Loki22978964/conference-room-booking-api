@@ -6,6 +6,8 @@
 
 Built with **.NET 10** · **Entity Framework Core** · **PostgreSQL**, following Clean Architecture principles.
 
+[![CI](https://github.com/Loki22978964/conference-room-booking-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Loki22978964/conference-room-booking-api/actions/workflows/ci.yml)
+
 </div>
 
 ---
