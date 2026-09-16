@@ -36,7 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Потрібно Sonar для коректного blame/PR аналізу
+          fetch-depth: 0
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -64,8 +64,10 @@ jobs:
         run: dotnet restore
 
       - name: Enable btree_gist extension
+        env:
+          PGPASSWORD: Password123!
         run: |
-          PGPASSWORD=Password123! psql -h localhost -U postgres -d conference_db \
+          psql -h localhost -U postgres -d conference_db \
             -c "CREATE EXTENSION IF NOT EXISTS btree_gist;"
 
       - name: Apply EF Core migrations
@@ -89,7 +91,7 @@ jobs:
           dotnet-sonarscanner begin \
             /k:"Loki22978964_conference-room-booking-api" \
             /o:"loki22978964" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
 
@@ -114,10 +116,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
       - name: Publish test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@31a54ee7eb7a8137202d78386082749a850d1916 # v1.9.1
         if: always()
         with:
           name: Test Results
