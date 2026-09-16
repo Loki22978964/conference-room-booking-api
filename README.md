@@ -1,19 +1,28 @@
-# Conference Room Booking API
+<div align="center">
 
-A REST API for managing conference room bookings — searching for available rooms, booking them with optional add-on services, and managing rooms/services as an administrator.
+# 🏢 Conference Room Booking API
 
-Built with **.NET 10**, **Entity Framework Core**, and **PostgreSQL**, following Clean Architecture principles.
+**A REST API for managing conference room bookings** — search for available rooms, book them with optional add-on services, and manage rooms as an administrator.
 
-## Features
+Built with **.NET 10** · **Entity Framework Core** · **PostgreSQL**, following Clean Architecture principles.
 
-- 🏢 **Room management** — create, update, soft-delete conference rooms
-- 🔍 **Availability search** — find rooms by date, time window, and required capacity
-- 📅 **Bookings** — book a room with optional services, with dynamic pricing based on time of day
-- 🛡️ **Overlap protection** — a PostgreSQL exclusion constraint prevents double-booking at the database level
-- 💰 **Dynamic pricing** — hourly rate multipliers for discount/peak/standard time windows
-- 📖 **Swagger / OpenAPI** — interactive API documentation out of the box
+</div>
 
-## Architecture
+---
+
+## ✨ Features
+
+| | |
+|---|---|
+| 🏢 | **Room management** — create, update, soft-delete conference rooms |
+| 🔍 | **Availability search** — find rooms by date, time window, and required capacity |
+| 📅 | **Bookings** — book a room with optional services, with dynamic pricing based on time of day |
+| 🛡️ | **Overlap protection** — a PostgreSQL exclusion constraint prevents double-booking at the database level |
+| 💰 | **Dynamic pricing** — hourly rate multipliers for discount/peak/standard time windows |
+| 📊 | **Revenue reports** — per-room revenue breakdown, exportable as CSV |
+| 📖 | **Swagger / OpenAPI** — interactive API documentation out of the box |
+
+## 🏗️ Architecture
 
 The solution follows a Clean Architecture layout, with dependencies pointing inward:
 
@@ -30,11 +39,11 @@ tests/
 ```
 
 - **Domain** entities (`Room`, `Booking`, `Service`) encapsulate their own invariants (e.g. a `Booking` cannot be created in the past, or with `start >= end`).
-- **Application** services (`RoomService`, `BookingService`) contain the use-case logic and depend only on abstractions (`IUnitOfWork`, repository interfaces).
+- **Application** services (`RoomService`, `BookingService`, `ReportService`) contain the use-case logic and depend only on abstractions (`IUnitOfWork`, repository interfaces).
 - Data access uses the **Repository + Unit of Work** pattern, combined with [Ardalis.Specification](https://github.com/ardalis/Specification) for composable, reusable queries (e.g. `RoomByIdWithServicesSpec`, `AvailableRoomsSpec`).
 - **Infrastructure** is the only layer that knows about EF Core / Npgsql; database-specific errors (like overlap-constraint violations) are translated into domain-friendly exceptions before crossing into the Application layer.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Component | Technology |
 |---|---|
@@ -45,7 +54,7 @@ tests/
 | API docs | Swashbuckle (Swagger UI) |
 | Testing | xUnit, Moq, FluentAssertions |
 
-## Prerequisites
+## ✅ Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Docker](https://www.docker.com/) and Docker Compose
@@ -54,7 +63,7 @@ tests/
   dotnet tool install --global dotnet-ef
   ```
 
-## Getting Started
+## 🚀 Getting Started
 
 ### 1. Clone the repository
 
@@ -63,33 +72,52 @@ git clone <repository-url>
 cd conference-room-booking-api
 ```
 
-### 2. Start PostgreSQL via Docker Compose
+### 2. Configure environment variables
+
+Copy the example env file and fill in your own values:
+
+```bash
+cp .env.example .env
+```
+
+`.env` holds the PostgreSQL credentials used by `docker-compose.yml`:
+
+```env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
+POSTGRES_DB=conference_db
+POSTGRES_PORT=5432
+```
+
+> ⚠️ `.env` is git-ignored and must never be committed. Only `.env.example` (with placeholder values) is tracked in the repository.
+
+### 3. Start PostgreSQL via Docker Compose
 
 ```bash
 docker compose up -d
 ```
 
-This starts a PostgreSQL container on port `5432` (see `docker-compose.yml` for credentials/config).
+This reads `.env` and starts a PostgreSQL container on the configured port (default `5432`).
 
-### 3. Configure the connection string
+### 4. Configure the API connection string
 
-Check `src/ConferenceBooking.Api/appsettings.json` and adjust if needed — it should match your `docker-compose.yml` settings:
+Make sure `src/ConferenceBooking.Api/appsettings.json` matches the values from your `.env` file:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=conference_db;Username=postgres;Password=Password123!"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=conference_db;Username=postgres;Password=your_secure_password_here"
   }
 }
 ```
 
-### 4. Apply database migrations
+### 5. Apply database migrations
 
 ```bash
 dotnet ef database update --project src/ConferenceBooking.Infrastructure --startup-project src/ConferenceBooking.Api
 ```
 
-### 5. Run the API
+### 6. Run the API
 
 ```bash
 dotnet run --project src/ConferenceBooking.Api
@@ -98,14 +126,16 @@ dotnet run --project src/ConferenceBooking.Api
 In the **Development** environment, the app automatically applies pending migrations and seeds sample data (rooms, services) on startup.
 
 The API will be available at:
-- `http://localhost:5292`
-- `https://localhost:7090`
 
-Swagger UI: `http://localhost:5292/swagger`
+| | |
+|---|---|
+| HTTP | `http://localhost:5292` |
+| HTTPS | `https://localhost:7090` |
+| Swagger UI | `http://localhost:5292/swagger` |
 
-> **Note:** if you haven't trusted the local HTTPS dev certificate yet, run `dotnet dev-certs https --trust`, or use the HTTP URL during local development.
+> 💡 If you haven't trusted the local HTTPS dev certificate yet, run `dotnet dev-certs https --trust`, or use the HTTP URL during local development.
 
-## Running Tests
+## 🧪 Running Tests
 
 ```bash
 # All tests
@@ -113,10 +143,9 @@ dotnet test
 
 # Unit tests only
 dotnet test tests/ConferenceBooking.UnitTests
-
 ```
 
-## API Overview
+## 📚 API Overview
 
 ### Rooms
 
@@ -134,15 +163,26 @@ dotnet test tests/ConferenceBooking.UnitTests
 |---|---|---|
 | `POST` | `/api/Bookings` | Book a room for a time slot, with optional services |
 
+### Reports
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/Reports/revenue` | Revenue report grouped by room, as JSON |
+| `GET` | `/api/Reports/revenue/export` | Same report, exported as a downloadable CSV file |
+
 Full request/response schemas are available in Swagger UI once the app is running.
 
-### Example: search for available rooms
+<details>
+<summary><strong>Example: search for available rooms</strong></summary>
 
 ```
 GET /api/Rooms/available?Date=2026-09-20&StartTime=10:00:00&EndTime=12:00:00&Capacity=10
 ```
 
-### Example: create a booking
+</details>
+
+<details>
+<summary><strong>Example: create a booking</strong></summary>
 
 ```json
 POST /api/Bookings
@@ -154,12 +194,14 @@ POST /api/Bookings
 }
 ```
 
-## Pricing Logic
+</details>
+
+## 💰 Pricing Logic
 
 Room cost is calculated per hour segment based on the local (Kyiv) time of day:
 
 | Time window (local) | Multiplier |
-|---|---|
+|---|:---:|
 | 06:00 – 09:00 | ×0.9 (discount) |
 | 09:00 – 12:00 | ×1.0 (standard) |
 | 12:00 – 14:00 | ×1.15 (peak surcharge) |
@@ -169,51 +211,40 @@ Room cost is calculated per hour segment based on the local (Kyiv) time of day:
 
 A booking that spans multiple windows is billed proportionally per segment. See `PriceCalculator.cs` for the implementation.
 
-## Double-Booking Prevention
+## 🔒 Double-Booking Prevention
 
 Overlapping bookings for the same room are rejected at two levels:
 
-1. **Database**: a PostgreSQL exclusion constraint (using the `btree_gist` extension) guarantees no two bookings for the same room can have overlapping time ranges, even under concurrent requests.
-2. **API**: a constraint violation is caught and translated into a `409 Conflict` response with a clear error message.
-
-## Project Status
-
-This is a work-in-progress learning/test project. Contributions and suggestions are welcome via issues or pull requests.
+1. **Database** — a PostgreSQL exclusion constraint (using the `btree_gist` extension) guarantees no two bookings for the same room can have overlapping time ranges, even under concurrent requests.
+2. **API** — a constraint violation is caught and translated into a `409 Conflict` response with a clear error message.
 
 ## 🎥 API Demonstration
 
-Below are examples of the key functionality in action via the Swagger UI.
+Examples of the key functionality in action via the Swagger UI.
 
-###  Room Management (RoomsController)
+### Room Management (`RoomsController`)
 
-**1. Creating a new room**
-![Creating a room](images/creating-a-room.gif)
+| | |
+|---|---|
+| **Creating a new room** | ![Creating a room](images/creating-a-room.gif) |
+| **Getting a room by ID** | ![Getting a room](images/get-room-by-Id.gif) |
+| **Updating room data** | ![Updating a room](images/Updating-room-data.gif) |
+| **Deleting a room (soft delete)** | ![Deleting a room](images/Delete-a-room.gif) |
+| **Finding available rooms for a specified time** | ![Finding available rooms](images/finding-available-rooms.gif) |
 
-**2. Getting a room by ID**
-![Getting a room](images/get-room-by-Id.gif)
+### Bookings (`BookingsController`)
 
-**3. Updating room data**
-![Updating a room](images/Updating-room-data.gif)
+| | |
+|---|---|
+| **Successful room booking with price calculation** | ![Successful booking](images/Successful-lease-of-a-space.gif) |
+| **Double booking protection (409 Conflict)** | ![Double booking protection](images/an-attempt-to-rent-a-property-that-has-already-been-rented.gif) |
 
-**4. Deleting a room (Soft Delete)**
-![Deleting a room](images/Delete-a-room.gif)
+### Analytics (`ReportsController`)
 
-**5. Finding available rooms for a specified time**
-![Finding available rooms](images/finding-available-rooms.gif)
+| | |
+|---|---|
+| **Generating a room revenue report** | ![Generating a report](images/Generating-a-lease-report.gif) |
 
----
+## 📌 Project Status
 
-###  Bookings (BookingsController)
-
-**6. Successful room booking with price calculation**
-![Successful booking](images/Successful-lease-of-a-space.gif)
-
-**7. Double booking protection (409 Conflict)**
-![Double booking protection](images/an-attempt-to-rent-a-property-that-has-already-been-rented.gif) 
-
----
-
-###  Analytics (ReportsController)
-
-**8. Generating a room revenue report**
-![Generating a report](images/Generating-a-lease-report.gif)
+This is a work-in-progress learning/test project. Contributions and suggestions are welcome via issues or pull requests.
