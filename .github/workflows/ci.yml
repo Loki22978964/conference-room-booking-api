@@ -119,7 +119,7 @@ jobs:
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
       - name: Publish test results
-        uses: dorny/test-reporter@31a54ee7eb7a8137202d78386082749a850d1916 # v1.9.1
+        uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Test Results
