@@ -5,7 +5,10 @@ using ConferenceBooking.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 
-Env.TraversePath().Load();
+if (Environment.GetEnvironmentVariable("POSTGRES_HOST") is null)
+{
+    Env.TraversePath().Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
