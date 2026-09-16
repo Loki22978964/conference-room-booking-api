@@ -16,6 +16,10 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write 
+      pull-requests: write 
 
     services:
       postgres:
@@ -117,15 +121,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
-
-      - name: Publish test results
-        uses: dorny/test-reporter@0920409a6ee04037596ad7a68fa962e731c3bf1e # v1.9.1
-        if: always()
-        with:
-          name: Test Results
-          path: '**/test-results.trx'
-          reporter: dotnet-trx
-          fail-on-error: false
 
   format-check:
     name: Code Style Check
