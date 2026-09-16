@@ -66,8 +66,10 @@ jobs:
             --project src/ConferenceBooking.Infrastructure \
             --startup-project src/ConferenceBooking.Api
         env:
-          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=conference_db;Username=postgres;Password=postgres"
-
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Password123!
+          POSTGRES_DB: conference_db
+          POSTGRES_PORT: 5432
       - name: Run tests
         run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
         env:
