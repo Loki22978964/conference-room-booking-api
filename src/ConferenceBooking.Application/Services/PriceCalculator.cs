@@ -18,7 +18,7 @@ public static class PriceCalculator
 
         while(current < endLocal)
         {
-            var nextHour = new DateTime(current.Year, current.Month, current.Day, current.Hour, 0, 0).AddHours(1);
+            var nextHour = new DateTime(current.Year, current.Month, current.Day, current.Hour, 0, 0, current.Kind).AddHours(1);
             var stepEnd = nextHour < endLocal ? nextHour : endLocal;
 
             var hoursInStep = (decimal)(stepEnd - current).TotalHours;
