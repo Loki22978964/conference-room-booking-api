@@ -10,7 +10,10 @@ public static class DatabaseSeeder
 {
     public static async Task SeedAsync(AppDbContext context)
     {
-        await context.Database.MigrateAsync();
+        if (context.Database.IsRelational())
+        {
+            await context.Database.MigrateAsync();
+        }
 
         if (!await context.Rooms.AnyAsync())
         {
@@ -27,7 +30,6 @@ public static class DatabaseSeeder
             context.Services.AddRange(projector, wifi, sound);
             await context.SaveChangesAsync();
 
-            // Прив'язуємо всі послуги до всіх залів для простоти (можна налаштувати індивідуально)
             var rooms = new[] { roomA, roomB, roomC };
             var services = new[] { projector, wifi, sound };
 
