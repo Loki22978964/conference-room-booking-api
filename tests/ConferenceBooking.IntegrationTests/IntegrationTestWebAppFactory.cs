@@ -21,8 +21,6 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // "Testing" пропускає dev-only блок автосіду в Program.cs,
-        // щоб кожен тестовий прогін починався з чистої, тільки-мігрованої бази.
         builder.UseEnvironment("Testing");
     }
 
@@ -38,7 +36,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await db.Database.MigrateAsync();
+        await DatabaseSeeder.SeedAsync(db);
     }
 
     public new async Task DisposeAsync()
