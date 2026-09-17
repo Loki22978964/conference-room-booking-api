@@ -22,7 +22,19 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedDataAsync_WhenDatabaseIsEmpty_CreatesThreeRoomsWithExpectedDetails()
+    public async Task SeedAsync_WithInMemoryProvider_SkipsMigrations_AndSeedsData()
+    {
+        using var context = CreateContext(Guid.NewGuid().ToString());
+
+        // InMemory не є relational, тому IsRelational() == false,
+        // і MigrateAsync() не викликається — виклик не повинен впасти.
+        var act = async () => await DatabaseSeeder.SeedAsync(context);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task SeedAsync_WhenDatabaseIsEmpty_CreatesThreeRoomsWithExpectedDetails()
     {
         using var context = CreateContext(Guid.NewGuid().ToString());
 
@@ -37,7 +49,7 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedDataAsync_WhenDatabaseIsEmpty_CreatesThreeServicesWithExpectedDetails()
+    public async Task SeedAsync_WhenDatabaseIsEmpty_CreatesThreeServicesWithExpectedDetails()
     {
         using var context = CreateContext(Guid.NewGuid().ToString());
 
@@ -52,7 +64,7 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedDataAsync_WhenDatabaseIsEmpty_LinksEveryRoomToEveryService()
+    public async Task SeedAsync_WhenDatabaseIsEmpty_LinksEveryRoomToEveryService()
     {
         using var context = CreateContext(Guid.NewGuid().ToString());
 
@@ -62,6 +74,7 @@ public class DatabaseSeederTests
         var serviceIds = await context.Services.Select(s => s.Id).ToListAsync();
         var links = await context.RoomServices.ToListAsync();
 
+        // 3 зали × 3 послуги = 9 зв'язків (декартів добуток)
         links.Should().HaveCount(9);
 
         foreach (var roomId in roomIds)
@@ -74,7 +87,7 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedDataAsync_WhenRoomsAlreadyExist_DoesNotAddMoreData()
+    public async Task SeedAsync_WhenRoomsAlreadyExist_DoesNotAddMoreData()
     {
         using var context = CreateContext(Guid.NewGuid().ToString());
 
@@ -95,7 +108,7 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedDataAsync_CalledTwiceInARow_IsIdempotent()
+    public async Task SeedAsync_CalledTwiceInARow_IsIdempotent()
     {
         using var context = CreateContext(Guid.NewGuid().ToString());
 
