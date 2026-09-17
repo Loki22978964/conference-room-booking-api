@@ -7,6 +7,10 @@ using System.Text;
 
 namespace ConferenceBooking.Application.Services;
 
+/// <summary>
+/// Generates revenue reports aggregated by room over a given date range,
+/// available as structured data or a downloadable CSV export.
+/// </summary>
 public class ReportService : IReportService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -16,6 +20,20 @@ public class ReportService : IReportService
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Builds a revenue report grouped by room for bookings starting within
+    /// the given date range.
+    /// </summary>
+    /// <param name="startDate">The start of the reporting period (inclusive).</param>
+    /// <param name="endDate">The end of the reporting period (inclusive).</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A report with per-room booking counts and revenue totals, sorted by revenue descending.</returns>
+    /// <remarks>
+    /// <paramref name="startDate"/> and <paramref name="endDate"/> are converted via
+    /// <see cref="DateTime.ToUniversalTime"/>. If either has <see cref="DateTimeKind.Unspecified"/>,
+    /// it is treated as local server time — callers should ensure the intended time zone
+    /// semantics match this behavior, or pass values that are already UTC.
+    /// </remarks>
     public async Task<RevenueReportDto> GetRevenueReportAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
         var startUtc = startDate.ToUniversalTime();
@@ -45,6 +63,14 @@ public class ReportService : IReportService
         };
     }
 
+    /// <summary>
+    /// Builds the same revenue report as <see cref="GetRevenueReportAsync"/> and
+    /// renders it as a UTF-8 encoded CSV file.
+    /// </summary>
+    /// <param name="startDate">The start of the reporting period (inclusive).</param>
+    /// <param name="endDate">The end of the reporting period (inclusive).</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>The CSV content as a UTF-8 byte array, with a header row and a trailing totals row.</returns>
     public async Task<byte[]> GetRevenueReportCsvAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
         var report = await GetRevenueReportAsync(startDate, endDate, cancellationToken);

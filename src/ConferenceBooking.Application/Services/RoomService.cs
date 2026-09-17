@@ -5,6 +5,10 @@ using ConferenceBooking.Domain.Entities;
 
 namespace ConferenceBooking.Application.Services;
 
+/// <summary>
+/// Implements room management use cases: creation, retrieval, updates,
+/// soft-deletion, and availability search.
+/// </summary>
 public class RoomService : IRoomService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -14,6 +18,12 @@ public class RoomService : IRoomService
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Creates and persists a new room.
+    /// </summary>
+    /// <param name="request">The room's name, capacity, and base hourly rate.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>The identifier of the newly created room.</returns>
     public async Task<Guid> CreateRoomAsync(CreateOrUpdateRoomRequest request, CancellationToken cancellationToken = default)
     {
         var room = new Room(request.Name, request.Capacity, request.BaseHourlyRate);
@@ -28,6 +38,12 @@ public class RoomService : IRoomService
         return room.Id;
     }
 
+    /// <summary>
+    /// Retrieves a single room, including its associated services, by its identifier.
+    /// </summary>
+    /// <param name="id">The room's identifier.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>The mapped room DTO, or <see langword="null"/> if no active room exists with this id.</returns>
     public async Task<RoomDto?> GetRoomAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdWithServicesSpec(id), cancellationToken);
@@ -52,6 +68,13 @@ public class RoomService : IRoomService
         };
     }
 
+    /// <summary>
+    /// Updates the name, capacity, and base hourly rate of an existing room.
+    /// </summary>
+    /// <param name="id">The identifier of the room to update.</param>
+    /// <param name="request">The updated room details.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns><see langword="true"/> if the room was found and updated; otherwise <see langword="false"/>.</returns>
     public async Task<bool> UpdateRoomAsync(Guid id, CreateOrUpdateRoomRequest request, CancellationToken cancellationToken = default)
     {
         var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdWithServicesSpec(id), cancellationToken);
@@ -67,6 +90,14 @@ public class RoomService : IRoomService
         return true;
     }
 
+    /// <summary>
+    /// Soft-deletes a room by marking it as inactive. The room is excluded from
+    /// future queries (via the global query filter on <c>IsActive</c>) but its
+    /// booking history is preserved.
+    /// </summary>
+    /// <param name="id">The identifier of the room to delete.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns><see langword="true"/> if the room was found and deleted; otherwise <see langword="false"/>.</returns>
     public async Task<bool> DeleteRoomAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var room = await _unitOfWork.Rooms.FirstOrDefaultAsync(new RoomByIdSpec(id), cancellationToken);
@@ -82,6 +113,19 @@ public class RoomService : IRoomService
         return true;
     }
 
+    /// <summary>
+    /// Searches for rooms that meet a minimum capacity and have no bookings
+    /// overlapping the requested date and time window.
+    /// </summary>
+    /// <param name="request">The desired date, start/end time, and minimum capacity.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>The list of matching, available rooms (may be empty).</returns>
+    /// <remarks>
+    /// <paramref name="request"/>'s date and time are combined and converted via
+    /// <see cref="DateTime.ToUniversalTime"/>. If the combined value has
+    /// <see cref="DateTimeKind.Unspecified"/>, it is treated as local server time —
+    /// callers should ensure the intended time zone semantics match this behavior.
+    /// </remarks>
     public async Task<List<RoomDto>> GetAvailableRoomsAsync(SearchRoomsRequest request, CancellationToken cancellationToken = default)
     {
         var startUtc = request.Date.Date.Add(request.StartTime).ToUniversalTime();
